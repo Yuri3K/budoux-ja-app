@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { GetContentService } from './services/get-content.service';
 import { Subscription } from 'rxjs';
+import { loadDefaultJapaneseParser } from 'budoux';
 
 @Component({
   selector: 'app-root',
@@ -8,6 +9,7 @@ import { Subscription } from 'rxjs';
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit, OnDestroy {
+  private parserJA = loadDefaultJapaneseParser();
 
   translates: { [key: string]: string }
   translatesSub$: Subscription
@@ -18,7 +20,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.translatesSub$ = this.getContentService.getContent().subscribe(
-      data => this.translates = data
+      data => {
+        this.translates = JSON.parse(this.parserJA.parse(JSON.stringify(data)).join('​'))
+      }
     )
   }
 
